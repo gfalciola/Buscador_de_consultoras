@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embudo Contactos NYON – Just</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f5f4f0;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 48px 24px 60px;
+  }
+  header { text-align: center; margin-bottom: 32px; }
+  header h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.2px; }
+  header p  { font-size: 12.5px; color: #999; margin-top: 5px; }
+  .date-range {
+    display: inline-block; margin-top: 10px;
+    font-size: 12px; font-weight: 600; color: #fff;
+    background: #2059a8; padding: 4px 16px; border-radius: 20px;
+    transition: background 0.2s;
+  }
+
+  /* ── toggle ── */
+  #mode-banner {
+    max-width: 1100px;
+    margin: 0 auto 18px auto;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border-left: 4px solid #ccc;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: #bbb;
+    transition: border-color 0.2s;
+  }
+
+  .toggle-wrap {
+    display: flex; gap: 0; margin-bottom: 32px;
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  }
+  .toggle-btn {
+    padding: 10px 32px; font-size: 13px; font-weight: 700;
+    cursor: pointer; border: none; transition: background 0.2s, color 0.2s;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .toggle-btn.buscador { background: #eaf4f0; color: #155f45; }
+  .toggle-btn.buscador.active { background: #155f45; color: #fff; }
+  .toggle-btn.comprar { background: #e8f0fb; color: #1a5fa8; }
+  .toggle-btn.vender  { background: #f0eaf8; color: #5a3d8a; }
+  .toggle-btn.autoinco { background: #e8f5ee; color: #1a6640; }
+  .toggle-btn.comprar.active  { background: #1a5fa8; color: #fff; }
+  .toggle-btn.vender.active   { background: #5a3d8a; color: #fff; }
+  .toggle-btn.autoinco.active { background: #1a6640; color: #fff; }
+
+  /* ── layout ── */
+  .funnels-row {
+    width: 100%; max-width: 1260px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; align-items: start;
+  }
+  .funnel-block { position: relative; }
+  .funnel-label {
+    text-align: center; font-size: 13px; font-weight: 700;
+    padding: 7px 0; border-radius: 8px; margin-bottom: 16px;
+  }
+  .funnel-label.nyon-c { color: #1a5fa8; border: 2px solid #1a5fa8; background: #eef4fc; }
+  .funnel-label.nyon-v { color: #5a3d8a; border: 2px solid #5a3d8a; background: #f3eefb; }
+  .funnel-label.nyon-a  { color: #1a6640; border: 2px solid #1a6640; background: #e8f5ee; }
+  .funnel-label.nyon-b  { color: #155f45; border: 2px solid #155f45; background: #eaf4f0; }
+  .funnel-label.comp {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    color: #555; border: 2px solid #ccc; background: #f7f6f3;
+  }
+  .region-select {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px; font-weight: 700; color: #1a1a1a;
+    background: transparent; border: none; outline: none;
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    padding-right: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0 center;
+  }
+
+  /* ── canvas / funnel ── */
+  .canvas { position: relative; }
+  .funnel-col {
+    display: flex; flex-direction: column; align-items: center;
+    padding-right: 240px;
+  }
+  .info-panel { position: absolute; top: 0; right: 0; width: 224px; }
+  .info-card {
+    position: absolute; left: 0; width: 100%;
+    padding: 7px 0 7px 14px;
+    display: flex; flex-direction: column; justify-content: center;
+    border-left: 4px solid transparent;
+    border-radius: 0 6px 6px 0;
+    background: rgba(255,255,255,0.58);
+  }
+  .info-title {
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: #888; margin-bottom: 5px;
+  }
+  .pills { display: flex; flex-direction: column; gap: 3px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    white-space: nowrap; width: fit-content;
+  }
+  .pill.azul  { background: #e3f0fb; color: #1660a0; }
+  .pill.rosa  { background: #fce8f5; color: #9a1870; }
+  .pill.verde { background: #e8f5ee; color: #1a6640; }
+  .pill.amber { background: #fff3e0; color: #7a4500; border: 1px solid #f5d08a; }
+  .pill.rojo  { background: #fdecea; color: #8a1a1a; }
+  .pill.purp  { background: #f3eefb; color: #5a3d8a; }
+  .info-sub  { font-size: 10.5px; color: #777; line-height: 1.5; }
+  .info-sub strong { color: #444; }
+  .info-note { font-size: 9.5px; color: #aaa; font-style: italic; margin-top: 3px; line-height: 1.4; }
+
+  /* ── barras ── */
+  .stage { width: 100%; display: flex; justify-content: center; }
+  .bar {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px 24px;
+    clip-path: polygon(3% 0%, 97% 0%, 100% 100%, 0% 100%);
+    cursor: default; transition: filter 0.15s; gap: 3px;
+  }
+  .bar:hover { filter: brightness(1.07); }
+  .bar-num   { font-size: 28px; font-weight: 800; color: #fff; line-height: 1; }
+  .bar-title { font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.92); text-align: center; line-height: 1.3; }
+
+  .connector {
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%; padding: 5px 0;
+  }
+  .conn-line  { width: 2px; height: 14px; background: #c0bdb8; }
+  .conn-pct   {
+    font-size: 10px; font-weight: 700; color: #999;
+    background: #eceae6; border: 1.5px solid #d8d5d0;
+    border-radius: 20px; padding: 2px 10px;
+    white-space: nowrap; margin: 2px 0;
+  }
+  .conn-arrow {
+    width: 0; height: 0;
+    border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-top: 7px solid #c0bdb8; margin-top: 2px;
+  }
+
+  /* colores NYON comprar */
+  .nc1{background:#1a5fa8} .nc2{background:#2e82cc} .nc3{background:#159060} .nc4{background:#c97c08}
+  /* colores NYON vender */
+  .nv1{background:#5a3d8a} .nv2{background:#7a5ab0} .nv3{background:#159060} .nv4{background:#c97c08}
+  /* colores comparativa */
+  .dc1{background:#3d4f5e} .dc2{background:#5a7a8a} .dc3{background:#2d7a5a} .dc4{background:#7a5c2e}
+
+  /* ── promedios ── */
+  .averages {
+    width: 100%; max-width: 1260px;
+    margin-top: 36px; background: #fff;
+    border-radius: 12px; padding: 20px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  .avg-section-title {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.7px;
+    color: #888; margin-bottom: 16px;
+  }
+  .avg-divider {
+    font-size: 10px; font-weight: 700; color: #aaa;
+    text-transform: uppercase; letter-spacing: 1px;
+    text-align: center; margin: 14px 0 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avg-divider::before,.avg-divider::after { content:''; flex:1; height:1px; background:#e5e3df; }
+  .avg-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .avg-row:last-child { margin-bottom: 0; }
+  .avg-label { font-size: 11px; color: #555; font-weight: 500; width: 300px; flex-shrink: 0; }
+  .avg-bar-wrap { flex:1; background:#f0efeb; border-radius:4px; height:10px; overflow:hidden; }
+  .avg-bar { height:100%; border-radius:4px; transition: width 0.4s ease; }
+  .avg-value { font-size: 13px; font-weight: 800; width: 52px; text-align: right; flex-shrink: 0; }
+
+  /* ── aviso vender ── */
+  .vender-note {
+    width: 100%; max-width: 1260px;
+    margin-top: 16px;
+    background: #fff8e1; border: 1px solid #ffe082;
+    border-radius: 8px; padding: 10px 18px;
+    font-size: 11px; color: #7a5800; line-height: 1.6;
+  }
+
+  /* ── page-wrap layout for buscador ── */
+  .page-wrap {
+    width: 100%; max-width: 1560px;
+    display: grid; grid-template-columns: 1fr 220px;
+    gap: 28px; align-items: start;
+  }
+  .main-content { min-width: 0; }
+  .top5-panel {
+    background: #fff; border-radius: 12px; padding: 20px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    position: sticky; top: 24px;
+  }
+  .top5-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #888; margin-bottom: 16px; }
+  .top5-section { margin-bottom: 18px; }
+  .top5-section:last-child { margin-bottom: 0; }
+  .top5-section-header { font-size: 10.5px; font-weight: 700; color: #444; border-left: 3px solid #ccc; padding-left: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .top5-icon { font-size: 11px; }
+  .top5-rows { display: flex; flex-direction: column; gap: 3px; }
+  .top5-row { display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 6px; border-radius: 4px; background: #f9f8f5; }
+  .top5-row.top5-nyon { background: #eaf4f0; margin-top: 3px; border-top: 1px dashed #9fd4c0; padding-top: 5px; }
+  .top5-pos { font-size: 10px; font-weight: 700; color: #aaa; width: 24px; flex-shrink: 0; text-align: center; }
+  .top5-row.top5-nyon .top5-pos { color: #155f45; }
+  .top5-row.top5-nyon .top5-name { color: #155f45; font-weight: 700; }
+  .top5-name { flex: 1; color: #333; font-weight: 500; }
+  .top5-val  { font-size: 11px; font-weight: 700; color: #555; }
+  .pill.conoce   { background: #e3f0fb; color: #1660a0; }
+  .pill.noconoce { background: #fce8f5; color: #9a1870; }
+  .pill.action   { background: #fff3e0; color: #7a4500; border: 1px solid #f5d08a; }
+
+  footer {
+    margin-top: 24px; font-size: 11px; color: #bbb;
+    text-align: center; max-width: 900px; line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Embudo de prospectos — NYON</h1>
+  <p id="main-subtitle">Buscador de consultores/as</p>
+  <div class="date-range" id="date-range">📅 2023 – mayo 2026 · 10.458 contactos totales</div>
+</header>
+
+<!-- toggle -->
+<div class="toggle-wrap">
+  <button class="toggle-btn buscador active" onclick="setMode('buscador')">🔍 Buscador</button>
+  <button class="toggle-btn comprar"         onclick="setMode('comprar')">📋 Formulario de contactos · Comprar</button>
+  <button class="toggle-btn vender"          onclick="setMode('vender')">📋 Formulario de contactos · Vender</button>
+  <button class="toggle-btn autoinco"        onclick="setMode('autoinco')">🔗 Auto Incorporación</button>
+</div>
+
+<div id="mode-banner"></div>
+
+<div id="buscador-wrap" style="display:none">
+  <!-- buscador content injected by JS -->
+</div>
+<div id="contactos-wrap">
+<div class="funnels-row">
+
+  <!-- NYON fijo -->
+  <div class="funnel-block">
+    <div class="funnel-label" id="nyon-label">NYON</div>
+    <div class="canvas" id="canvas-nyon">
+      <div class="funnel-col" id="nyon-funnel"></div>
+      <div class="info-panel" id="nyon-panel"></div>
+    </div>
+  </div>
+
+  <!-- Comparativa -->
+  <div class="funnel-block">
+    <div class="funnel-label comp">
+      <span style="color:#888;font-weight:400;font-size:11px;">Comparar con:</span>
+      <select class="region-select" id="regionSelect" onchange="updateComp()"></select>
+    </div>
+    <div class="canvas" id="canvas-comp">
+      <div class="funnel-col" id="comp-funnel"></div>
+      <div class="info-panel" id="comp-panel"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="vender-note" id="vender-note" style="display:none">
+  ⚠️ <strong>Flujo discontinuado desde 2025:</strong> los datos de "Quiero vender" corresponden a 2023–2024. A partir de 2025 el proceso de incorporación se redirige al portal de <strong>Auto Incorporación</strong>.
+</div>
+<div class="vender-note" id="autoinco-note" style="display:none;background:#e8f5ee;border-color:#a5d6b5;color:#1a5030;">
+  🔗 <strong>AutoInco · Asignación equivalente al buscador:</strong> incluye únicamente los sources <strong>Asignación automática</strong>, <strong>Consultora conocida</strong> y <strong>Geolocalización</strong>. Período: mar 2024 – may 2026 (28 meses) · 22.759 incorporaciones totales · 758 sin invitación en la red.
+</div>
+
+<!-- promedios -->
+<div class="averages">
+  <div class="avg-section-title" id="avg-title">Promedio mensual por etapa · 40 meses (2023 – mayo 2026)</div>
+
+  <div class="avg-row" id="avg-total-row">
+    <div class="avg-label" id="avg-total-label" style="font-weight:700;">📊 Total formularios enviados</div>
+    <div class="avg-bar-wrap"><div class="avg-bar" id="avg-total-bar" style="width:100%"></div></div>
+    <div class="avg-value" id="avg-total-val"></div>
+  </div>
+  <div style="height:1px;background:#e0ddd8;margin-bottom:14px;"></div>
+
+  <div class="avg-divider">NYON</div>
+  <div id="avg-nyon-rows"></div>
+
+  <div class="avg-divider" id="avg-comp-label">— elegí una región —</div>
+  <div id="avg-comp-rows"></div>
+</div>
+
+</div><!-- /contactos-wrap -->
+
+<footer id="footer-contactos"></footer>
+
+<script>
+const TOTALES = { comprar: 1929, vender: 8529, autoinco: 758 };
+const MESES   = { comprar: 40,   vender: 24,   autoinco: 28 };
+
+const DATA_C = {"AIGLE":{"total":21,"nombre":3,"geo":18,"geo_por_lead":16,"geo_por_just":2,"geo_invalido":2,"geo_valido":16},"AIROLO":{"total":9,"nombre":0,"geo":9,"geo_por_lead":9,"geo_por_just":0,"geo_invalido":2,"geo_valido":7},"ALLAINE":{"total":28,"nombre":5,"geo":23,"geo_por_lead":23,"geo_por_just":0,"geo_invalido":7,"geo_valido":16},"ALLE":{"total":6,"nombre":3,"geo":3,"geo_por_lead":2,"geo_por_just":1,"geo_invalido":0,"geo_valido":3},"ARGOVIA":{"total":8,"nombre":2,"geo":6,"geo_por_lead":6,"geo_por_just":0,"geo_invalido":1,"geo_valido":5},"AYENT":{"total":56,"nombre":2,"geo":54,"geo_por_lead":52,"geo_por_just":2,"geo_invalido":13,"geo_valido":41},"BASEL":{"total":9,"nombre":0,"geo":9,"geo_por_lead":9,"geo_por_just":0,"geo_invalido":4,"geo_valido":5},"BERNESES":{"total":4,"nombre":0,"geo":4,"geo_por_lead":4,"geo_por_just":0,"geo_invalido":0,"geo_valido":4},"BIASCA":{"total":29,"nombre":1,"geo":28,"geo_por_lead":26,"geo_por_just":2,"geo_invalido":13,"geo_valido":15},"BLONAY":{"total":8,"nombre":0,"geo":8,"geo_por_lead":7,"geo_por_just":1,"geo_invalido":1,"geo_valido":7},"BRIENZ":{"total":21,"nombre":9,"geo":12,"geo_por_lead":11,"geo_por_just":1,"geo_invalido":4,"geo_valido":8},"BUENSY":{"total":21,"nombre":0,"geo":21,"geo_por_lead":21,"geo_por_just":0,"geo_invalido":8,"geo_valido":13},"BULLE":{"total":54,"nombre":4,"geo":50,"geo_por_lead":46,"geo_por_just":4,"geo_invalido":8,"geo_valido":42},"CELERINA":{"total":19,"nombre":4,"geo":15,"geo_por_lead":15,"geo_por_just":0,"geo_invalido":5,"geo_valido":10},"CHEXBRES":{"total":23,"nombre":1,"geo":22,"geo_por_lead":21,"geo_por_just":1,"geo_invalido":4,"geo_valido":18},"CHUR":{"total":77,"nombre":11,"geo":66,"geo_por_lead":61,"geo_por_just":5,"geo_invalido":14,"geo_valido":52},"CLARENS":{"total":5,"nombre":1,"geo":4,"geo_por_lead":4,"geo_por_just":0,"geo_invalido":1,"geo_valido":3},"CONSTANZA":{"total":1,"nombre":0,"geo":1,"geo_por_lead":0,"geo_por_just":1,"geo_invalido":0,"geo_valido":1},"CRANS SUR SIERRE":{"total":9,"nombre":3,"geo":6,"geo_por_lead":5,"geo_por_just":1,"geo_invalido":2,"geo_valido":4},"CRISTALLINA":{"total":10,"nombre":0,"geo":10,"geo_por_lead":10,"geo_por_just":0,"geo_invalido":2,"geo_valido":8},"DANUBIO":{"total":10,"nombre":4,"geo":6,"geo_por_lead":5,"geo_por_just":1,"geo_invalido":0,"geo_valido":6},"DOSSEN":{"total":5,"nombre":1,"geo":4,"geo_por_lead":3,"geo_por_just":1,"geo_invalido":2,"geo_valido":2},"EIGER":{"total":21,"nombre":2,"geo":19,"geo_por_lead":18,"geo_por_just":1,"geo_invalido":6,"geo_valido":13},"EVOLENE":{"total":31,"nombre":2,"geo":29,"geo_por_lead":27,"geo_por_just":2,"geo_invalido":7,"geo_valido":22},"FRIBOURG":{"total":4,"nombre":1,"geo":3,"geo_por_lead":2,"geo_por_just":1,"geo_invalido":0,"geo_valido":3},"GANDRIA":{"total":20,"nombre":1,"geo":19,"geo_por_lead":18,"geo_por_just":1,"geo_invalido":2,"geo_valido":17},"GENEVE":{"total":15,"nombre":2,"geo":13,"geo_por_lead":10,"geo_por_just":3,"geo_invalido":3,"geo_valido":10},"GLARIS":{"total":41,"nombre":9,"geo":32,"geo_por_lead":32,"geo_por_just":0,"geo_invalido":6,"geo_valido":26},"GRIMENTZ":{"total":14,"nombre":5,"geo":9,"geo_por_lead":9,"geo_por_just":0,"geo_invalido":2,"geo_valido":7},"IBACH":{"total":1,"nombre":0,"geo":1,"geo_por_lead":1,"geo_por_just":0,"geo_invalido":0,"geo_valido":1},"ILANZ":{"total":1,"nombre":0,"geo":1,"geo_por_lead":1,"geo_por_just":0,"geo_invalido":0,"geo_valido":1},"JAUN":{"total":1,"nombre":1,"geo":0,"geo_por_lead":0,"geo_por_just":0,"geo_invalido":0,"geo_valido":0},"JUNGFRAU":{"total":24,"nombre":3,"geo":21,"geo_por_lead":19,"geo_por_just":2,"geo_invalido":2,"geo_valido":19},"JURA":{"total":1,"nombre":0,"geo":1,"geo_por_lead":1,"geo_por_just":0,"geo_invalido":0,"geo_valido":1},"JUST":{"total":6,"nombre":6,"geo":0,"geo_por_lead":0,"geo_por_just":0,"geo_invalido":0,"geo_valido":0},"LAUSANA":{"total":39,"nombre":5,"geo":34,"geo_por_lead":33,"geo_por_just":1,"geo_invalido":3,"geo_valido":31},"LE LOCLE":{"total":37,"nombre":1,"geo":36,"geo_por_lead":35,"geo_por_just":1,"geo_invalido":4,"geo_valido":32},"LEMAN":{"total":8,"nombre":1,"geo":7,"geo_por_lead":7,"geo_por_just":0,"geo_invalido":1,"geo_valido":6},"LUCERNA":{"total":18,"nombre":0,"geo":18,"geo_por_lead":16,"geo_por_just":2,"geo_invalido":5,"geo_valido":13},"MARLY":{"total":2,"nombre":2,"geo":0,"geo_por_lead":0,"geo_por_just":0,"geo_invalido":0,"geo_valido":0},"MARTIGNY":{"total":2,"nombre":0,"geo":2,"geo_por_lead":2,"geo_por_just":0,"geo_invalido":1,"geo_valido":1},"MEYRIN":{"total":18,"nombre":2,"geo":16,"geo_por_lead":15,"geo_por_just":1,"geo_invalido":3,"geo_valido":13},"MITELLAND":{"total":15,"nombre":1,"geo":14,"geo_por_lead":12,"geo_por_just":2,"geo_invalido":4,"geo_valido":10},"MONT DOLENT":{"total":3,"nombre":0,"geo":3,"geo_por_lead":3,"geo_por_just":0,"geo_invalido":1,"geo_valido":2},"MONTHEY":{"total":37,"nombre":5,"geo":32,"geo_por_lead":30,"geo_por_just":2,"geo_invalido":8,"geo_valido":24},"MORAT":{"total":3,"nombre":0,"geo":3,"geo_por_lead":3,"geo_por_just":0,"geo_invalido":0,"geo_valido":3},"NEUCHATEL":{"total":42,"nombre":3,"geo":39,"geo_por_lead":37,"geo_por_just":2,"geo_invalido":6,"geo_valido":33},"NODO ACACIAS":{"total":4,"nombre":0,"geo":4,"geo_por_lead":4,"geo_por_just":0,"geo_invalido":3,"geo_valido":1},"NODO BADEN":{"total":29,"nombre":1,"geo":28,"geo_por_lead":25,"geo_por_just":3,"geo_invalido":4,"geo_valido":24},"NODO CALDEIRA":{"total":1,"nombre":0,"geo":1,"geo_por_lead":1,"geo_por_just":0,"geo_invalido":1,"geo_valido":0},"NODO FAZZIO":{"total":4,"nombre":1,"geo":3,"geo_por_lead":2,"geo_por_just":1,"geo_invalido":0,"geo_valido":3},"NODO HEIDEN":{"total":1,"nombre":0,"geo":1,"geo_por_lead":1,"geo_por_just":0,"geo_invalido":0,"geo_valido":1},"NODO MEGGEN":{"total":20,"nombre":0,"geo":20,"geo_por_lead":18,"geo_por_just":2,"geo_invalido":3,"geo_valido":17},"NODO ROMONT":{"total":2,"nombre":0,"geo":2,"geo_por_lead":2,"geo_por_just":0,"geo_invalido":1,"geo_valido":1},"NYON":{"total":58,"nombre":2,"geo":56,"geo_por_lead":54,"geo_por_just":2,"geo_invalido":6,"geo_valido":50},"OBERDORF":{"total":13,"nombre":6,"geo":7,"geo_por_lead":6,"geo_por_just":1,"geo_invalido":2,"geo_valido":5},"OBERHOFEN":{"total":23,"nombre":2,"geo":21,"geo_por_lead":19,"geo_por_just":2,"geo_invalido":5,"geo_valido":16},"ORBE THIELE":{"total":18,"nombre":4,"geo":14,"geo_por_lead":12,"geo_por_just":2,"geo_invalido":1,"geo_valido":13},"PARADISO":{"total":53,"nombre":2,"geo":51,"geo_por_lead":48,"geo_por_just":3,"geo_invalido":9,"geo_valido":42},"PRANGINS":{"total":24,"nombre":4,"geo":20,"geo_por_lead":17,"geo_por_just":3,"geo_invalido":3,"geo_valido":17},"REINACH":{"total":24,"nombre":6,"geo":18,"geo_por_lead":17,"geo_por_just":1,"geo_invalido":2,"geo_valido":16},"RHEINFALL":{"total":22,"nombre":2,"geo":20,"geo_por_lead":18,"geo_por_just":2,"geo_invalido":2,"geo_valido":18},"RIEHEN":{"total":5,"nombre":1,"geo":4,"geo_por_lead":3,"geo_por_just":1,"geo_invalido":2,"geo_valido":2},"RIVIERA":{"total":11,"nombre":0,"geo":11,"geo_por_lead":10,"geo_por_just":1,"geo_invalido":1,"geo_valido":10},"ROMANDIA":{"total":26,"nombre":0,"geo":26,"geo_por_lead":24,"geo_por_just":2,"geo_invalido":8,"geo_valido":18},"SANTIS":{"total":85,"nombre":7,"geo":78,"geo_por_lead":68,"geo_por_just":10,"geo_invalido":18,"geo_valido":60},"SENSE":{"total":12,"nombre":0,"geo":12,"geo_por_lead":11,"geo_por_just":1,"geo_invalido":3,"geo_valido":9},"SERTIG":{"total":20,"nombre":2,"geo":18,"geo_por_lead":16,"geo_por_just":2,"geo_invalido":5,"geo_valido":13},"SIMME":{"total":28,"nombre":3,"geo":25,"geo_por_lead":21,"geo_por_just":4,"geo_invalido":6,"geo_valido":19},"ST. MORITZ":{"total":41,"nombre":2,"geo":39,"geo_por_lead":36,"geo_por_just":3,"geo_invalido":2,"geo_valido":37},"STANS":{"total":5,"nombre":0,"geo":5,"geo_por_lead":5,"geo_por_just":0,"geo_invalido":0,"geo_valido":5},"SUMVITG":{"total":19,"nombre":3,"geo":16,"geo_por_lead":15,"geo_por_just":1,"geo_invalido":4,"geo_valido":12},"TAVERNE":{"total":54,"nombre":2,"geo":52,"geo_por_lead":51,"geo_por_just":1,"geo_invalido":11,"geo_valido":41},"THAL":{"total":1,"nombre":0,"geo":1,"geo_por_lead":1,"geo_por_just":0,"geo_invalido":1,"geo_valido":0},"TICINO":{"total":34,"nombre":4,"geo":30,"geo_por_lead":27,"geo_por_just":3,"geo_invalido":5,"geo_valido":25},"TREVISINA":{"total":10,"nombre":1,"geo":9,"geo_por_lead":8,"geo_por_just":1,"geo_invalido":4,"geo_valido":5},"TRIENT":{"total":41,"nombre":3,"geo":38,"geo_por_lead":37,"geo_por_just":1,"geo_invalido":13,"geo_valido":25},"URI":{"total":14,"nombre":0,"geo":14,"geo_por_lead":14,"geo_por_just":0,"geo_invalido":3,"geo_valido":11},"VALAIS":{"total":4,"nombre":0,"geo":4,"geo_por_lead":4,"geo_por_just":0,"geo_invalido":1,"geo_valido":3},"VALS":{"total":9,"nombre":1,"geo":8,"geo_por_lead":8,"geo_por_just":0,"geo_invalido":4,"geo_valido":4},"VERBIER":{"total":8,"nombre":1,"geo":7,"geo_por_lead":6,"geo_por_just":1,"geo_invalido":2,"geo_valido":5},"VEVEY":{"total":7,"nombre":4,"geo":3,"geo_por_lead":3,"geo_por_just":0,"geo_invalido":0,"geo_valido":3},"VISP":{"total":10,"nombre":2,"geo":8,"geo_por_lead":8,"geo_por_just":0,"geo_invalido":2,"geo_valido":6},"WALZENHAUSEN":{"total":13,"nombre":2,"geo":11,"geo_por_lead":11,"geo_por_just":0,"geo_invalido":1,"geo_valido":10},"WEESEN":{"total":17,"nombre":0,"geo":17,"geo_por_lead":14,"geo_por_just":3,"geo_invalido":5,"geo_valido":12},"ZERMATT":{"total":2,"nombre":0,"geo":2,"geo_por_lead":2,"geo_por_just":0,"geo_invalido":1,"geo_valido":1},"ZUG":{"total":33,"nombre":0,"geo":33,"geo_por_lead":31,"geo_por_just":2,"geo_invalido":8,"geo_valido":25}};
+const DATA_V = {"AIGLE":{"total":22,"cancelado":0,"seleccion":16,"incorporada":6,"con_kit":0,"por_just":7,"por_lead":15,"geo":13,"nombre":6},"AIROLO":{"total":15,"cancelado":0,"seleccion":7,"incorporada":8,"con_kit":0,"por_just":7,"por_lead":8,"geo":10,"nombre":2},"ALLAINE":{"total":18,"cancelado":0,"seleccion":17,"incorporada":1,"con_kit":0,"por_just":2,"por_lead":16,"geo":17,"nombre":0},"ALLE":{"total":13,"cancelado":0,"seleccion":6,"incorporada":4,"con_kit":3,"por_just":2,"por_lead":11,"geo":10,"nombre":1},"ARGOVIA":{"total":11,"cancelado":0,"seleccion":7,"incorporada":4,"con_kit":0,"por_just":0,"por_lead":11,"geo":10,"nombre":1},"AYENT":{"total":70,"cancelado":0,"seleccion":51,"incorporada":17,"con_kit":1,"por_just":8,"por_lead":62,"geo":66,"nombre":3},"BASEL":{"total":17,"cancelado":0,"seleccion":11,"incorporada":5,"con_kit":0,"por_just":3,"por_lead":14,"geo":16,"nombre":1},"BERNESES":{"total":20,"cancelado":0,"seleccion":10,"incorporada":8,"con_kit":1,"por_just":7,"por_lead":13,"geo":16,"nombre":0},"BIASCA":{"total":66,"cancelado":0,"seleccion":38,"incorporada":25,"con_kit":2,"por_just":11,"por_lead":55,"geo":59,"nombre":3},"BLONAY":{"total":18,"cancelado":0,"seleccion":12,"incorporada":2,"con_kit":0,"por_just":9,"por_lead":9,"geo":10,"nombre":2},"BRIENZ":{"total":28,"cancelado":0,"seleccion":18,"incorporada":7,"con_kit":3,"por_just":3,"por_lead":25,"geo":28,"nombre":0},"BUENSY":{"total":21,"cancelado":0,"seleccion":15,"incorporada":6,"con_kit":0,"por_just":6,"por_lead":15,"geo":20,"nombre":0},"BULLE":{"total":80,"cancelado":0,"seleccion":55,"incorporada":20,"con_kit":5,"por_just":15,"por_lead":65,"geo":62,"nombre":15},"CELERINA":{"total":41,"cancelado":0,"seleccion":34,"incorporada":7,"con_kit":0,"por_just":6,"por_lead":35,"geo":39,"nombre":2},"CHEXBRES":{"total":18,"cancelado":0,"seleccion":6,"incorporada":11,"con_kit":0,"por_just":2,"por_lead":16,"geo":12,"nombre":4},"CHUR":{"total":201,"cancelado":0,"seleccion":154,"incorporada":39,"con_kit":5,"por_just":23,"por_lead":178,"geo":177,"nombre":19},"CLARENS":{"total":7,"cancelado":0,"seleccion":3,"incorporada":3,"con_kit":0,"por_just":2,"por_lead":5,"geo":5,"nombre":1},"CONSTANZA":{"total":12,"cancelado":0,"seleccion":4,"incorporada":8,"con_kit":0,"por_just":1,"por_lead":11,"geo":11,"nombre":1},"CRANS SUR SIERRE":{"total":18,"cancelado":0,"seleccion":7,"incorporada":9,"con_kit":2,"por_just":3,"por_lead":15,"geo":14,"nombre":4},"CRISTALLINA":{"total":16,"cancelado":0,"seleccion":12,"incorporada":4,"con_kit":0,"por_just":1,"por_lead":15,"geo":16,"nombre":0},"DANUBIO":{"total":27,"cancelado":0,"seleccion":15,"incorporada":11,"con_kit":1,"por_just":9,"por_lead":18,"geo":21,"nombre":4},"DOSSEN":{"total":7,"cancelado":0,"seleccion":3,"incorporada":4,"con_kit":0,"por_just":2,"por_lead":5,"geo":7,"nombre":0},"EIGER":{"total":48,"cancelado":0,"seleccion":28,"incorporada":18,"con_kit":1,"por_just":7,"por_lead":41,"geo":41,"nombre":5},"EVOLENE":{"total":39,"cancelado":0,"seleccion":29,"incorporada":9,"con_kit":0,"por_just":4,"por_lead":35,"geo":37,"nombre":1},"FRIBOURG":{"total":17,"cancelado":0,"seleccion":9,"incorporada":8,"con_kit":0,"por_just":4,"por_lead":13,"geo":17,"nombre":0},"GANDRIA":{"total":33,"cancelado":0,"seleccion":28,"incorporada":5,"con_kit":0,"por_just":0,"por_lead":33,"geo":33,"nombre":0},"GENEVE":{"total":8,"cancelado":0,"seleccion":7,"incorporada":1,"con_kit":0,"por_just":1,"por_lead":7,"geo":8,"nombre":0},"GLARIS":{"total":82,"cancelado":0,"seleccion":55,"incorporada":20,"con_kit":7,"por_just":11,"por_lead":71,"geo":81,"nombre":1},"GRIMENTZ":{"total":23,"cancelado":0,"seleccion":14,"incorporada":7,"con_kit":0,"por_just":9,"por_lead":14,"geo":18,"nombre":2},"IBACH":{"total":6,"cancelado":0,"seleccion":2,"incorporada":4,"con_kit":0,"por_just":2,"por_lead":4,"geo":5,"nombre":1},"ILANZ":{"total":10,"cancelado":0,"seleccion":6,"incorporada":4,"con_kit":0,"por_just":2,"por_lead":8,"geo":10,"nombre":0},"JAUN":{"total":35,"cancelado":0,"seleccion":32,"incorporada":1,"con_kit":1,"por_just":4,"por_lead":31,"geo":34,"nombre":0},"JUNGFRAU":{"total":31,"cancelado":0,"seleccion":21,"incorporada":8,"con_kit":1,"por_just":6,"por_lead":25,"geo":28,"nombre":2},"LAUSANA":{"total":162,"cancelado":0,"seleccion":147,"incorporada":14,"con_kit":1,"por_just":11,"por_lead":151,"geo":158,"nombre":4},"LE LOCLE":{"total":71,"cancelado":0,"seleccion":56,"incorporada":13,"con_kit":2,"por_just":11,"por_lead":60,"geo":69,"nombre":2},"LEMAN":{"total":29,"cancelado":0,"seleccion":13,"incorporada":12,"con_kit":0,"por_just":11,"por_lead":18,"geo":17,"nombre":4},"LUCERNA":{"total":28,"cancelado":0,"seleccion":16,"incorporada":12,"con_kit":0,"por_just":3,"por_lead":25,"geo":27,"nombre":0},"MARLY":{"total":18,"cancelado":0,"seleccion":8,"incorporada":6,"con_kit":1,"por_just":7,"por_lead":11,"geo":13,"nombre":2},"MARTIGNY":{"total":12,"cancelado":0,"seleccion":5,"incorporada":6,"con_kit":0,"por_just":3,"por_lead":9,"geo":9,"nombre":1},"MEYRIN":{"total":25,"cancelado":0,"seleccion":18,"incorporada":7,"con_kit":0,"por_just":8,"por_lead":17,"geo":24,"nombre":1},"MITELLAND":{"total":25,"cancelado":0,"seleccion":20,"incorporada":5,"con_kit":0,"por_just":5,"por_lead":20,"geo":24,"nombre":1},"MONT DOLENT":{"total":7,"cancelado":0,"seleccion":1,"incorporada":6,"con_kit":0,"por_just":0,"por_lead":7,"geo":7,"nombre":0},"MONTHEY":{"total":25,"cancelado":0,"seleccion":15,"incorporada":8,"con_kit":2,"por_just":8,"por_lead":17,"geo":23,"nombre":2},"MORAT":{"total":5,"cancelado":0,"seleccion":1,"incorporada":3,"con_kit":0,"por_just":2,"por_lead":3,"geo":2,"nombre":1},"NEUCHATEL":{"total":64,"cancelado":0,"seleccion":49,"incorporada":12,"con_kit":3,"por_just":12,"por_lead":52,"geo":62,"nombre":0},"NODO ACACIAS":{"total":5,"cancelado":0,"seleccion":3,"incorporada":2,"con_kit":0,"por_just":1,"por_lead":4,"geo":5,"nombre":0},"NODO BADEN":{"total":77,"cancelado":0,"seleccion":54,"incorporada":19,"con_kit":4,"por_just":10,"por_lead":67,"geo":74,"nombre":2},"NODO FAZZIO":{"total":3,"cancelado":0,"seleccion":3,"incorporada":0,"con_kit":0,"por_just":0,"por_lead":3,"geo":3,"nombre":0},"NODO MEGGEN":{"total":21,"cancelado":0,"seleccion":10,"incorporada":11,"con_kit":0,"por_just":3,"por_lead":18,"geo":20,"nombre":0},"NODO ROMONT":{"total":3,"cancelado":0,"seleccion":3,"incorporada":0,"con_kit":0,"por_just":1,"por_lead":2,"geo":3,"nombre":0},"NYON":{"total":57,"cancelado":0,"seleccion":36,"incorporada":18,"con_kit":3,"por_just":12,"por_lead":45,"geo":47,"nombre":6},"OBERDORF":{"total":9,"cancelado":0,"seleccion":7,"incorporada":2,"con_kit":0,"por_just":2,"por_lead":7,"geo":9,"nombre":0},"OBERHOFEN":{"total":8,"cancelado":0,"seleccion":4,"incorporada":4,"con_kit":0,"por_just":5,"por_lead":3,"geo":6,"nombre":1},"ORBE THIELE":{"total":41,"cancelado":0,"seleccion":17,"incorporada":19,"con_kit":4,"por_just":6,"por_lead":35,"geo":37,"nombre":1},"PARADISO":{"total":83,"cancelado":0,"seleccion":53,"incorporada":27,"con_kit":2,"por_just":17,"por_lead":66,"geo":76,"nombre":6},"PRANGINS":{"total":31,"cancelado":0,"seleccion":23,"incorporada":8,"con_kit":0,"por_just":10,"por_lead":21,"geo":25,"nombre":6},"REINACH":{"total":42,"cancelado":0,"seleccion":28,"incorporada":13,"con_kit":1,"por_just":11,"por_lead":31,"geo":41,"nombre":1},"RHEINFALL":{"total":60,"cancelado":0,"seleccion":42,"incorporada":17,"con_kit":1,"por_just":10,"por_lead":50,"geo":47,"nombre":13},"RIEHEN":{"total":11,"cancelado":0,"seleccion":6,"incorporada":3,"con_kit":2,"por_just":6,"por_lead":5,"geo":11,"nombre":0},"RIVIERA":{"total":8,"cancelado":0,"seleccion":7,"incorporada":1,"con_kit":0,"por_just":2,"por_lead":6,"geo":5,"nombre":3},"ROMANDIA":{"total":28,"cancelado":0,"seleccion":12,"incorporada":12,"con_kit":0,"por_just":10,"por_lead":18,"geo":23,"nombre":0},"SANTIS":{"total":109,"cancelado":0,"seleccion":67,"incorporada":42,"con_kit":0,"por_just":19,"por_lead":90,"geo":106,"nombre":1},"SENSE":{"total":33,"cancelado":0,"seleccion":29,"incorporada":4,"con_kit":0,"por_just":3,"por_lead":30,"geo":32,"nombre":0},"SERTIG":{"total":46,"cancelado":0,"seleccion":30,"incorporada":14,"con_kit":2,"por_just":9,"por_lead":37,"geo":43,"nombre":2},"SIMME":{"total":72,"cancelado":0,"seleccion":45,"incorporada":25,"con_kit":1,"por_just":16,"por_lead":56,"geo":65,"nombre":5},"ST. MORITZ":{"total":86,"cancelado":0,"seleccion":51,"incorporada":21,"con_kit":1,"por_just":36,"por_lead":50,"geo":60,"nombre":1},"STANS":{"total":18,"cancelado":0,"seleccion":8,"incorporada":10,"con_kit":0,"por_just":4,"por_lead":14,"geo":18,"nombre":0},"SUMVITG":{"total":15,"cancelado":0,"seleccion":3,"incorporada":12,"con_kit":0,"por_just":4,"por_lead":11,"geo":13,"nombre":1},"TAVERNE":{"total":64,"cancelado":0,"seleccion":46,"incorporada":16,"con_kit":2,"por_just":11,"por_lead":53,"geo":58,"nombre":5},"THAL":{"total":7,"cancelado":0,"seleccion":6,"incorporada":1,"con_kit":0,"por_just":2,"por_lead":5,"geo":7,"nombre":0},"TICINO":{"total":70,"cancelado":0,"seleccion":53,"incorporada":12,"con_kit":2,"por_just":11,"por_lead":59,"geo":58,"nombre":3},"TREVISINA":{"total":7,"cancelado":0,"seleccion":5,"incorporada":2,"con_kit":0,"por_just":2,"por_lead":5,"geo":7,"nombre":0},"TRIENT":{"total":68,"cancelado":0,"seleccion":42,"incorporada":26,"con_kit":0,"por_just":14,"por_lead":54,"geo":60,"nombre":7},"URI":{"total":37,"cancelado":0,"seleccion":30,"incorporada":7,"con_kit":0,"por_just":7,"por_lead":30,"geo":35,"nombre":1},"VALS":{"total":19,"cancelado":0,"seleccion":17,"incorporada":1,"con_kit":1,"por_just":5,"por_lead":14,"geo":19,"nombre":0},"VERBIER":{"total":18,"cancelado":0,"seleccion":9,"incorporada":9,"con_kit":0,"por_just":4,"por_lead":14,"geo":16,"nombre":0},"VEVEY":{"total":31,"cancelado":0,"seleccion":17,"incorporada":12,"con_kit":2,"por_just":6,"por_lead":25,"geo":27,"nombre":4},"VISP":{"total":21,"cancelado":0,"seleccion":18,"incorporada":3,"con_kit":0,"por_just":0,"por_lead":21,"geo":19,"nombre":2},"WALZENHAUSEN":{"total":22,"cancelado":0,"seleccion":13,"incorporada":8,"con_kit":1,"por_just":5,"por_lead":17,"geo":20,"nombre":2},"WEESEN":{"total":27,"cancelado":0,"seleccion":16,"incorporada":8,"con_kit":2,"por_just":7,"por_lead":20,"geo":26,"nombre":1},"ZERMATT":{"total":22,"cancelado":0,"seleccion":13,"incorporada":6,"con_kit":0,"por_just":10,"por_lead":12,"geo":10,"nombre":4},"ZUG":{"total":50,"cancelado":0,"seleccion":41,"incorporada":9,"con_kit":0,"por_just":6,"por_lead":44,"geo":23,"nombre":27}};
+
+let MODE = 'comprar';
+
+const DATA_AI = {"AIGLE":{"total":6,"aa":3,"kc":2,"uc":1},"AIROLO":{"total":6,"aa":4,"kc":2,"uc":0},"ALLAINE":{"total":5,"aa":4,"kc":1,"uc":0},"ALLE":{"total":7,"aa":6,"kc":0,"uc":1},"AYENT":{"total":23,"aa":19,"kc":2,"uc":2},"BASEL":{"total":4,"aa":2,"kc":0,"uc":2},"BERNESES":{"total":3,"aa":2,"kc":0,"uc":1},"BIASCA":{"total":22,"aa":11,"kc":5,"uc":6},"BLONAY":{"total":5,"aa":3,"kc":1,"uc":1},"BRIENZ":{"total":8,"aa":4,"kc":1,"uc":3},"BUENSY":{"total":5,"aa":3,"kc":2,"uc":0},"BULLE":{"total":19,"aa":7,"kc":10,"uc":2},"CELERINA":{"total":9,"aa":7,"kc":1,"uc":1},"CHEXBRES":{"total":7,"aa":5,"kc":1,"uc":1},"CHUR":{"total":16,"aa":9,"kc":5,"uc":2},"CLARENS":{"total":4,"aa":1,"kc":1,"uc":2},"CONSTANZA":{"total":2,"aa":1,"kc":1,"uc":0},"CRANS SUR SIERRE":{"total":7,"aa":4,"kc":3,"uc":0},"CRISTALLINA":{"total":4,"aa":1,"kc":1,"uc":2},"DANUBIO":{"total":31,"aa":8,"kc":17,"uc":6},"DOSSEN":{"total":7,"aa":7,"kc":0,"uc":0},"EIGER":{"total":28,"aa":7,"kc":20,"uc":1},"EVOLENE":{"total":7,"aa":3,"kc":3,"uc":1},"FRIBOURG":{"total":2,"aa":0,"kc":2,"uc":0},"GANDRIA":{"total":5,"aa":2,"kc":2,"uc":1},"GENEVE":{"total":6,"aa":3,"kc":1,"uc":2},"GLARIS":{"total":18,"aa":12,"kc":2,"uc":4},"GRIMENTZ":{"total":9,"aa":2,"kc":2,"uc":5},"IBACH":{"total":1,"aa":1,"kc":0,"uc":0},"ILANZ":{"total":3,"aa":1,"kc":2,"uc":0},"JAUN":{"total":8,"aa":3,"kc":1,"uc":4},"JUNGFRAU":{"total":9,"aa":5,"kc":2,"uc":2},"LAUSANA":{"total":6,"aa":3,"kc":1,"uc":2},"LE LOCLE":{"total":12,"aa":9,"kc":2,"uc":1},"LEMAN":{"total":13,"aa":9,"kc":2,"uc":2},"LUCERNA":{"total":2,"aa":2,"kc":0,"uc":0},"MARLY":{"total":3,"aa":2,"kc":1,"uc":0},"MARTIGNY":{"total":5,"aa":3,"kc":1,"uc":1},"MEYRIN":{"total":4,"aa":1,"kc":1,"uc":2},"MITELLAND":{"total":10,"aa":4,"kc":2,"uc":4},"MONT DOLENT":{"total":3,"aa":1,"kc":0,"uc":2},"MONTHEY":{"total":15,"aa":7,"kc":5,"uc":3},"NEUCHATEL":{"total":24,"aa":14,"kc":1,"uc":9},"NODO ACACIAS":{"total":1,"aa":1,"kc":0,"uc":0},"NODO BADEN":{"total":9,"aa":2,"kc":3,"uc":4},"NODO MEGGEN":{"total":9,"aa":6,"kc":1,"uc":2},"NYON":{"total":11,"aa":7,"kc":3,"uc":1},"OBERDORF":{"total":5,"aa":4,"kc":0,"uc":1},"OBERHOFEN":{"total":10,"aa":6,"kc":4,"uc":0},"ORBE THIELE":{"total":4,"aa":3,"kc":0,"uc":1},"PARADISO":{"total":20,"aa":16,"kc":3,"uc":1},"PRANGINS":{"total":13,"aa":9,"kc":2,"uc":2},"REINACH":{"total":16,"aa":7,"kc":6,"uc":3},"RHEINFALL":{"total":14,"aa":6,"kc":5,"uc":3},"RIEHEN":{"total":4,"aa":3,"kc":1,"uc":0},"RIVIERA":{"total":4,"aa":3,"kc":0,"uc":1},"ROMANDIA":{"total":5,"aa":3,"kc":1,"uc":1},"SANTIS":{"total":30,"aa":18,"kc":4,"uc":8},"SENSE":{"total":8,"aa":6,"kc":1,"uc":1},"SERTIG":{"total":8,"aa":4,"kc":0,"uc":4},"SIMME":{"total":13,"aa":9,"kc":1,"uc":3},"ST. MORITZ":{"total":9,"aa":3,"kc":4,"uc":2},"STANS":{"total":2,"aa":2,"kc":0,"uc":0},"SUMVITG":{"total":5,"aa":4,"kc":0,"uc":1},"TAVERNE":{"total":13,"aa":6,"kc":4,"uc":3},"THAL":{"total":3,"aa":1,"kc":2,"uc":0},"TICINO":{"total":28,"aa":9,"kc":15,"uc":4},"TREVISINA":{"total":4,"aa":0,"kc":3,"uc":1},"TRIENT":{"total":22,"aa":11,"kc":2,"uc":9},"URI":{"total":16,"aa":11,"kc":0,"uc":5},"VALAIS":{"total":5,"aa":5,"kc":0,"uc":0},"VALS":{"total":6,"aa":2,"kc":1,"uc":3},"VERBIER":{"total":11,"aa":1,"kc":8,"uc":2},"VEVEY":{"total":9,"aa":7,"kc":0,"uc":2},"VISP":{"total":6,"aa":3,"kc":2,"uc":1},"WALZENHAUSEN":{"total":18,"aa":14,"kc":1,"uc":3},"WEESEN":{"total":7,"aa":3,"kc":1,"uc":3},"ZERMATT":{"total":1,"aa":1,"kc":0,"uc":0},"ZUG":{"total":5,"aa":3,"kc":1,"uc":1}};
+
+
+// ══ BUSCADOR DATA ══
+const BUSCADOR_TOTAL  = 15088;
+const BUSCADOR_MONTHS = 23;
+const DATA_B = {"AIGLE":{"enResultados":562,"seleccionada":58,"compras":2,"res_nombre":20,"res_geo":542,"visitada":52,"autenticado":1,"registrado":5},"AIROLO":{"enResultados":121,"seleccionada":42,"compras":0,"res_nombre":22,"res_geo":99,"visitada":41,"autenticado":1,"registrado":0},"ALLAINE":{"enResultados":603,"seleccionada":83,"compras":1,"res_nombre":33,"res_geo":570,"visitada":78,"autenticado":2,"registrado":3},"ALLE":{"enResultados":267,"seleccionada":38,"compras":0,"res_nombre":11,"res_geo":256,"visitada":37,"autenticado":0,"registrado":1},"ARGOVIA":{"enResultados":293,"seleccionada":27,"compras":0,"res_nombre":14,"res_geo":279,"visitada":25,"autenticado":1,"registrado":1},"AYENT":{"enResultados":1787,"seleccionada":238,"compras":1,"res_nombre":62,"res_geo":1725,"visitada":224,"autenticado":6,"registrado":8},"BASEL":{"enResultados":522,"seleccionada":49,"compras":2,"res_nombre":22,"res_geo":500,"visitada":45,"autenticado":2,"registrado":2},"BERNESES":{"enResultados":95,"seleccionada":23,"compras":0,"res_nombre":12,"res_geo":83,"visitada":22,"autenticado":1,"registrado":0},"BIASCA":{"enResultados":1384,"seleccionada":170,"compras":1,"res_nombre":75,"res_geo":1309,"visitada":156,"autenticado":8,"registrado":6},"BLONAY":{"enResultados":638,"seleccionada":56,"compras":1,"res_nombre":32,"res_geo":606,"visitada":49,"autenticado":4,"registrado":3},"BRIENZ":{"enResultados":299,"seleccionada":60,"compras":1,"res_nombre":44,"res_geo":255,"visitada":58,"autenticado":0,"registrado":2},"BUENSY":{"enResultados":575,"seleccionada":77,"compras":0,"res_nombre":25,"res_geo":550,"visitada":73,"autenticado":3,"registrado":1},"BULLE":{"enResultados":2086,"seleccionada":254,"compras":2,"res_nombre":52,"res_geo":2034,"visitada":242,"autenticado":4,"registrado":8},"CELERINA":{"enResultados":351,"seleccionada":100,"compras":2,"res_nombre":35,"res_geo":316,"visitada":93,"autenticado":3,"registrado":4},"CHEXBRES":{"enResultados":904,"seleccionada":102,"compras":1,"res_nombre":25,"res_geo":879,"visitada":95,"autenticado":5,"registrado":2},"CHUR":{"enResultados":2216,"seleccionada":345,"compras":4,"res_nombre":104,"res_geo":2112,"visitada":329,"autenticado":8,"registrado":8},"CLARENS":{"enResultados":159,"seleccionada":21,"compras":0,"res_nombre":20,"res_geo":139,"visitada":21,"autenticado":0,"registrado":0},"CONSTANZA":{"enResultados":283,"seleccionada":30,"compras":0,"res_nombre":26,"res_geo":257,"visitada":28,"autenticado":2,"registrado":0},"CRANS SUR SIERRE":{"enResultados":302,"seleccionada":37,"compras":0,"res_nombre":16,"res_geo":286,"visitada":37,"autenticado":0,"registrado":0},"CRISTALLINA":{"enResultados":399,"seleccionada":65,"compras":2,"res_nombre":46,"res_geo":353,"visitada":60,"autenticado":2,"registrado":3},"DANUBIO":{"enResultados":448,"seleccionada":116,"compras":0,"res_nombre":60,"res_geo":388,"visitada":107,"autenticado":5,"registrado":4},"DOSSEN":{"enResultados":243,"seleccionada":28,"compras":0,"res_nombre":18,"res_geo":225,"visitada":26,"autenticado":1,"registrado":1},"EIGER":{"enResultados":1164,"seleccionada":113,"compras":0,"res_nombre":30,"res_geo":1134,"visitada":107,"autenticado":1,"registrado":5},"EVOLENE":{"enResultados":1298,"seleccionada":67,"compras":1,"res_nombre":44,"res_geo":1254,"visitada":62,"autenticado":2,"registrado":3},"FRIBOURG":{"enResultados":260,"seleccionada":46,"compras":0,"res_nombre":12,"res_geo":248,"visitada":42,"autenticado":4,"registrado":0},"GANDRIA":{"enResultados":512,"seleccionada":55,"compras":0,"res_nombre":12,"res_geo":500,"visitada":52,"autenticado":3,"registrado":0},"GENEVE":{"enResultados":482,"seleccionada":91,"compras":0,"res_nombre":32,"res_geo":450,"visitada":88,"autenticado":2,"registrado":1},"GLARIS":{"enResultados":1569,"seleccionada":216,"compras":3,"res_nombre":59,"res_geo":1510,"visitada":207,"autenticado":3,"registrado":6},"GRIMENTZ":{"enResultados":199,"seleccionada":45,"compras":0,"res_nombre":14,"res_geo":185,"visitada":43,"autenticado":0,"registrado":2},"IBACH":{"enResultados":269,"seleccionada":10,"compras":0,"res_nombre":9,"res_geo":260,"visitada":10,"autenticado":0,"registrado":0},"ILANZ":{"enResultados":347,"seleccionada":45,"compras":0,"res_nombre":18,"res_geo":329,"visitada":45,"autenticado":0,"registrado":0},"JAUN":{"enResultados":186,"seleccionada":41,"compras":0,"res_nombre":19,"res_geo":167,"visitada":39,"autenticado":1,"registrado":1},"JUNGFRAU":{"enResultados":905,"seleccionada":126,"compras":1,"res_nombre":26,"res_geo":879,"visitada":118,"autenticado":4,"registrado":4},"LAUSANA":{"enResultados":1870,"seleccionada":178,"compras":3,"res_nombre":41,"res_geo":1829,"visitada":163,"autenticado":4,"registrado":11},"LE LOCLE":{"enResultados":1307,"seleccionada":136,"compras":1,"res_nombre":21,"res_geo":1286,"visitada":124,"autenticado":7,"registrado":5},"LEMAN":{"enResultados":314,"seleccionada":48,"compras":0,"res_nombre":21,"res_geo":293,"visitada":48,"autenticado":0,"registrado":0},"LUCERNA":{"enResultados":623,"seleccionada":73,"compras":0,"res_nombre":7,"res_geo":616,"visitada":71,"autenticado":1,"registrado":1},"MARLY":{"enResultados":360,"seleccionada":59,"compras":0,"res_nombre":31,"res_geo":329,"visitada":55,"autenticado":3,"registrado":1},"MARTIGNY":{"enResultados":157,"seleccionada":39,"compras":1,"res_nombre":32,"res_geo":125,"visitada":33,"autenticado":5,"registrado":1},"MEYRIN":{"enResultados":504,"seleccionada":77,"compras":0,"res_nombre":29,"res_geo":475,"visitada":75,"autenticado":0,"registrado":2},"MITELLAND":{"enResultados":927,"seleccionada":112,"compras":1,"res_nombre":24,"res_geo":903,"visitada":108,"autenticado":1,"registrado":3},"MONT DOLENT":{"enResultados":181,"seleccionada":17,"compras":0,"res_nombre":10,"res_geo":171,"visitada":14,"autenticado":2,"registrado":1},"MONTHEY":{"enResultados":1572,"seleccionada":171,"compras":2,"res_nombre":61,"res_geo":1511,"visitada":158,"autenticado":6,"registrado":7},"MORAT":{"enResultados":225,"seleccionada":17,"compras":1,"res_nombre":9,"res_geo":216,"visitada":15,"autenticado":0,"registrado":2},"NEUCHATEL":{"enResultados":1199,"seleccionada":156,"compras":4,"res_nombre":30,"res_geo":1169,"visitada":147,"autenticado":3,"registrado":6},"NODO ACACIAS":{"enResultados":86,"seleccionada":5,"compras":0,"res_nombre":1,"res_geo":85,"visitada":4,"autenticado":0,"registrado":1},"NODO ARBON":{"enResultados":138,"seleccionada":19,"compras":0,"res_nombre":7,"res_geo":131,"visitada":16,"autenticado":1,"registrado":2},"NODO BADEN":{"enResultados":1059,"seleccionada":55,"compras":1,"res_nombre":17,"res_geo":1042,"visitada":48,"autenticado":2,"registrado":5},"NODO FAZZIO":{"enResultados":141,"seleccionada":24,"compras":0,"res_nombre":1,"res_geo":140,"visitada":23,"autenticado":1,"registrado":0},"NODO MEGGEN":{"enResultados":656,"seleccionada":112,"compras":1,"res_nombre":12,"res_geo":644,"visitada":108,"autenticado":1,"registrado":3},"NODO ROMONT":{"enResultados":56,"seleccionada":4,"compras":1,"res_nombre":6,"res_geo":50,"visitada":1,"autenticado":2,"registrado":1},"NYON":{"enResultados":1689,"seleccionada":194,"compras":1,"res_nombre":74,"res_geo":1615,"visitada":181,"autenticado":7,"registrado":6},"OBERDORF":{"enResultados":103,"seleccionada":35,"compras":0,"res_nombre":28,"res_geo":75,"visitada":33,"autenticado":2,"registrado":0},"OBERHOFEN":{"enResultados":1276,"seleccionada":162,"compras":3,"res_nombre":63,"res_geo":1213,"visitada":153,"autenticado":4,"registrado":5},"ORBE THIELE":{"enResultados":183,"seleccionada":45,"compras":1,"res_nombre":16,"res_geo":167,"visitada":43,"autenticado":0,"registrado":2},"PARADISO":{"enResultados":1897,"seleccionada":236,"compras":1,"res_nombre":62,"res_geo":1835,"visitada":220,"autenticado":6,"registrado":10},"PRANGINS":{"enResultados":768,"seleccionada":114,"compras":2,"res_nombre":85,"res_geo":683,"visitada":108,"autenticado":1,"registrado":5},"REINACH":{"enResultados":494,"seleccionada":116,"compras":0,"res_nombre":80,"res_geo":414,"visitada":107,"autenticado":7,"registrado":2},"RHEINFALL":{"enResultados":609,"seleccionada":113,"compras":2,"res_nombre":36,"res_geo":573,"visitada":103,"autenticado":6,"registrado":4},"RIEHEN":{"enResultados":673,"seleccionada":71,"compras":0,"res_nombre":19,"res_geo":654,"visitada":70,"autenticado":0,"registrado":1},"RIVIERA":{"enResultados":365,"seleccionada":33,"compras":0,"res_nombre":16,"res_geo":349,"visitada":32,"autenticado":0,"registrado":1},"ROMANDIA":{"enResultados":1053,"seleccionada":115,"compras":4,"res_nombre":28,"res_geo":1025,"visitada":105,"autenticado":1,"registrado":9},"SANTIS":{"enResultados":2370,"seleccionada":287,"compras":3,"res_nombre":79,"res_geo":2291,"visitada":263,"autenticado":15,"registrado":9},"SENSE":{"enResultados":383,"seleccionada":68,"compras":1,"res_nombre":22,"res_geo":361,"visitada":65,"autenticado":1,"registrado":2},"SERTIG":{"enResultados":588,"seleccionada":101,"compras":1,"res_nombre":30,"res_geo":558,"visitada":100,"autenticado":0,"registrado":1},"SIMME":{"enResultados":468,"seleccionada":97,"compras":0,"res_nombre":36,"res_geo":432,"visitada":93,"autenticado":2,"registrado":2},"ST. MORITZ":{"enResultados":1879,"seleccionada":134,"compras":2,"res_nombre":46,"res_geo":1833,"visitada":127,"autenticado":2,"registrado":5},"STANS":{"enResultados":392,"seleccionada":25,"compras":1,"res_nombre":18,"res_geo":374,"visitada":23,"autenticado":1,"registrado":1},"SUMVITG":{"enResultados":517,"seleccionada":67,"compras":0,"res_nombre":21,"res_geo":496,"visitada":64,"autenticado":2,"registrado":1},"TAVERNE":{"enResultados":2091,"seleccionada":149,"compras":0,"res_nombre":42,"res_geo":2049,"visitada":139,"autenticado":3,"registrado":7},"THAL":{"enResultados":336,"seleccionada":23,"compras":0,"res_nombre":11,"res_geo":325,"visitada":21,"autenticado":0,"registrado":2},"TICINO":{"enResultados":1159,"seleccionada":102,"compras":0,"res_nombre":48,"res_geo":1111,"visitada":95,"autenticado":2,"registrado":5},"TREVISINA":{"enResultados":519,"seleccionada":52,"compras":0,"res_nombre":24,"res_geo":495,"visitada":49,"autenticado":0,"registrado":3},"TRIENT":{"enResultados":845,"seleccionada":188,"compras":3,"res_nombre":111,"res_geo":734,"visitada":180,"autenticado":2,"registrado":6},"URI":{"enResultados":1021,"seleccionada":105,"compras":3,"res_nombre":17,"res_geo":1004,"visitada":99,"autenticado":2,"registrado":4},"VALAIS":{"enResultados":208,"seleccionada":17,"compras":0,"res_nombre":4,"res_geo":204,"visitada":17,"autenticado":0,"registrado":0},"VALS":{"enResultados":334,"seleccionada":35,"compras":0,"res_nombre":11,"res_geo":323,"visitada":34,"autenticado":0,"registrado":1},"VERBIER":{"enResultados":666,"seleccionada":53,"compras":0,"res_nombre":25,"res_geo":641,"visitada":50,"autenticado":0,"registrado":3},"VEVEY":{"enResultados":625,"seleccionada":109,"compras":0,"res_nombre":41,"res_geo":584,"visitada":105,"autenticado":4,"registrado":0},"VISP":{"enResultados":79,"seleccionada":37,"compras":0,"res_nombre":20,"res_geo":59,"visitada":36,"autenticado":0,"registrado":1},"WALZENHAUSEN":{"enResultados":378,"seleccionada":44,"compras":2,"res_nombre":32,"res_geo":346,"visitada":36,"autenticado":5,"registrado":3},"WEESEN":{"enResultados":843,"seleccionada":97,"compras":0,"res_nombre":16,"res_geo":827,"visitada":95,"autenticado":1,"registrado":1},"ZERMATT":{"enResultados":120,"seleccionada":13,"compras":0,"res_nombre":7,"res_geo":113,"visitada":13,"autenticado":0,"registrado":0},"ZUG":{"enResultados":1309,"seleccionada":162,"compras":3,"res_nombre":37,"res_geo":1272,"visitada":139,"autenticado":11,"registrado":12}};
+
+function convPct(a) { return ((a/BUSCADOR_TOTAL)*100).toFixed(3)+'%'; }
+
+function renderBuscador() {
+  const nyon = DATA_B['NYON'];
+  const sel  = document.getElementById('regionSelect');
+  const r    = sel.value;
+  const d    = DATA_B[r] || DATA_B['CHUR'];
+
+  // Populate select with buscador regions if not already done
+  if (!sel.dataset.buscadorPopulated) {
+    sel.innerHTML = '';
+    Object.keys(DATA_B).sort().filter(k => k !== 'NYON').forEach(reg => {
+      const o = document.createElement('option');
+      o.value = reg; o.textContent = reg;
+      if (reg === 'CHUR') o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.dataset.buscadorPopulated = '1';
+  }
+
+  // Build NYON funnel (static)
+  document.getElementById('nyon-funnel').innerHTML = `
+    <div class="stage" id="n-s1">
+      <div class="bar" style="background:#155f45;width:100%">
+        <span class="bar-num">15.088</span>
+        <span class="bar-title">Búsquedas registradas</span>
+      </div>
+    </div>
+    <div class="connector" id="n-c1">
+      <div class="conn-line"></div>
+      <div class="conn-pct">11,2% tuvo resultados NYON</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="n-s2">
+      <div class="bar" style="background:#2a9060;width:72%">
+        <span class="bar-num">1.689</span>
+        <span class="bar-title">Resultados con consultoras NYON elegibles</span>
+      </div>
+    </div>
+    <div class="connector" id="n-c2">
+      <div class="conn-line"></div>
+      <div class="conn-pct">11,5% eligió una NYON</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="n-s3">
+      <div class="bar" style="background:#c97c08;width:44%">
+        <span class="bar-num">194</span>
+        <span class="bar-title">Consultora NYON elegida</span>
+      </div>
+    </div>
+    <div class="connector" id="n-c3">
+      <div class="conn-line"></div>
+      <div class="conn-pct">0,5% concretó una compra</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="n-s4">
+      <div class="bar" style="background:#159060;width:20%">
+        <span class="bar-num">1</span>
+        <span class="bar-title">Compras a NYON</span>
+      </div>
+    </div>`;
+
+  document.getElementById('nyon-panel').innerHTML = `
+    <div class="info-card" style="border-left-color:#155f45" id="n-i1">
+      <div class="info-title">Tipo de búsqueda</div>
+      <div class="pills">
+        <span class="pill conoce">👤 Por nombre: 6.692</span>
+        <span class="pill noconoce">📍 Por geolocalización: 8.396</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:#2a9060" id="n-i2">
+      <div class="info-title">Búsquedas con NYON en resultados</div>
+      <div class="pills">
+        <span class="pill conoce">👤 Por nombre: 74</span>
+        <span class="pill noconoce">📍 Por geolocalización: 1.615</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:#c97c08" id="n-i3">
+      <div class="info-title">Acción realizada</div>
+      <div class="pills">
+        <span class="pill action">🏪 Visitó tienda: 181</span>
+        <span class="pill action">🔐 Se autenticó: 7</span>
+        <span class="pill action">📝 Se registró: 6</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:#159060" id="n-i4">
+      <div class="info-title">Conversión total</div>
+      <div class="info-sub"><strong>0,007%</strong> del total terminó en compra NYON</div>
+    </div>`;
+
+  updateBuscadorComp();
+}
+
+function updateBuscadorComp() {
+  const sel = document.getElementById('regionSelect');
+  const r   = sel.value;
+  const d   = DATA_B[r];
+  if (!d) return;
+
+  document.getElementById('comp-funnel').innerHTML = `
+    <div class="stage" id="c-s1">
+      <div class="bar" style="background:#3d4f5e;width:100%">
+        <span class="bar-num">${fmt(BUSCADOR_TOTAL)}</span>
+        <span class="bar-title">Búsquedas registradas</span>
+      </div>
+    </div>
+    <div class="connector" id="c-c1">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.enResultados,BUSCADOR_TOTAL)} tuvo resultados ${r}</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="c-s2">
+      <div class="bar" style="background:#5a7a8a;width:72%">
+        <span class="bar-num">${fmt(d.enResultados)}</span>
+        <span class="bar-title">Resultados con consultoras ${r} elegibles</span>
+      </div>
+    </div>
+    <div class="connector" id="c-c2">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.seleccionada,d.enResultados)} eligió una ${r}</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="c-s3">
+      <div class="bar" style="background:#7a5c2e;width:44%">
+        <span class="bar-num">${fmt(d.seleccionada)}</span>
+        <span class="bar-title">Consultora ${r} elegida</span>
+      </div>
+    </div>
+    <div class="connector" id="c-c3">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.compras,d.seleccionada)} concretó una compra</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="c-s4">
+      <div class="bar" style="background:#1e6b4a;width:20%">
+        <span class="bar-num">${fmt(d.compras)}</span>
+        <span class="bar-title">Compras a ${r}</span>
+      </div>
+    </div>`;
+
+  document.getElementById('comp-panel').innerHTML = `
+    <div class="info-card" style="border-left-color:#3d4f5e" id="c-i1">
+      <div class="info-title">Tipo de búsqueda</div>
+      <div class="pills">
+        <span class="pill conoce">👤 Por nombre: 6.692</span>
+        <span class="pill noconoce">📍 Por geolocalización: 8.396</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:#5a7a8a" id="c-i2">
+      <div class="info-title">Búsquedas con ${r} en resultados</div>
+      <div class="pills">
+        <span class="pill conoce">👤 Por nombre: ${fmt(d.res_nombre)}</span>
+        <span class="pill noconoce">📍 Por geolocalización: ${fmt(d.res_geo)}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:#c97c08" id="c-i3">
+      <div class="info-title">Acción realizada</div>
+      <div class="pills">
+        <span class="pill action">🏪 Visitó tienda: ${d.visitada}</span>
+        <span class="pill action">🔐 Se autenticó: ${d.autenticado}</span>
+        <span class="pill action">📝 Se registró: ${d.registrado}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:#1e6b4a" id="c-i4">
+      <div class="info-title">Conversión total</div>
+      <div class="info-sub"><strong>${convPct(d.compras)}</strong> del total terminó en compra ${r}</div>
+    </div>`;
+
+  // promedios buscador
+  document.getElementById('avg-title').textContent = 'Promedio mensual por etapa · 23 meses (14 jun 2024 – 13 may 2026)';
+  document.getElementById('avg-total-label').textContent = '🔍 Total búsquedas registradas';
+  document.getElementById('avg-total-bar').style.background = '#155f45';
+  document.getElementById('avg-total-val').style.color      = '#155f45';
+  document.getElementById('avg-total-label').style.color    = '#155f45';
+  document.getElementById('avg-total-val').textContent      = fmtDec(BUSCADOR_TOTAL / BUSCADOR_MONTHS);
+
+  document.getElementById('avg-nyon-rows').innerHTML = `
+    <div class="avg-row">
+      <div class="avg-label" style="color:#2a9060;font-weight:700;">Con NYON en resultados</div>
+      <div class="avg-bar-wrap"><div class="avg-bar" style="width:11.2%;background:#2a9060"></div></div>
+      <div class="avg-value" style="color:#2a9060;">73,4</div>
+    </div>
+    <div class="avg-row">
+      <div class="avg-label" style="color:#c97c08;font-weight:700;">Consultora NYON elegida</div>
+      <div class="avg-bar-wrap"><div class="avg-bar" style="width:1.3%;background:#c97c08"></div></div>
+      <div class="avg-value" style="color:#c97c08;">8,4</div>
+    </div>
+    <div class="avg-row">
+      <div class="avg-label" style="color:#159060;font-weight:700;">Compras a NYON</div>
+      <div class="avg-bar-wrap"><div class="avg-bar" style="width:0.07%;background:#159060;min-width:3px"></div></div>
+      <div class="avg-value" style="color:#159060;">0,04</div>
+    </div>`;
+
+  document.getElementById('avg-comp-label').textContent = r;
+  const wRes = Math.max(0.5, (d.enResultados / BUSCADOR_TOTAL * 100)).toFixed(1);
+  const wSel = Math.max(0.5, (d.seleccionada  / BUSCADOR_TOTAL * 100)).toFixed(1);
+  const wCmp = Math.max(0.1, (d.compras       / BUSCADOR_TOTAL * 100)).toFixed(2);
+  document.getElementById('avg-comp-rows').innerHTML = `
+    <div class="avg-row">
+      <div class="avg-label" style="color:#3d4f5e;font-weight:700;">Con ${r} en resultados</div>
+      <div class="avg-bar-wrap"><div class="avg-bar" style="width:${wRes}%;background:#3d4f5e"></div></div>
+      <div class="avg-value" style="color:#3d4f5e;">${fmtDec(d.enResultados/BUSCADOR_MONTHS)}</div>
+    </div>
+    <div class="avg-row">
+      <div class="avg-label" style="color:#7a5c2e;font-weight:700;">Consultora ${r} elegida</div>
+      <div class="avg-bar-wrap"><div class="avg-bar" style="width:${wSel}%;background:#7a5c2e"></div></div>
+      <div class="avg-value" style="color:#7a5c2e;">${fmtDec(d.seleccionada/BUSCADOR_MONTHS)}</div>
+    </div>
+    <div class="avg-row">
+      <div class="avg-label" style="color:#1e6b4a;font-weight:700;">Compras a ${r}</div>
+      <div class="avg-bar-wrap"><div class="avg-bar" style="width:${wCmp}%;background:#1e6b4a;min-width:3px"></div></div>
+      <div class="avg-value" style="color:#1e6b4a;">${fmtDec(d.compras/BUSCADOR_MONTHS)}</div>
+    </div>`;
+
+  setTimeout(alignAll, 50);
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('es-AR'); }
+function fmtDec(n) { return n < 1 ? n.toFixed(2) : n.toFixed(1); }
+function pct(a,b) { return b ? ((a/b)*100).toFixed(1)+'%' : '0%'; }
+function bw(val, max) { return Math.max(14, Math.round((val/max)*100)); }
+
+// Colores por modo
+const COLS = {
+  comprar:  { n1:'#1a5fa8', n2:'#2e82cc', n3:'#159060', n4:'#c97c08' },
+  vender:   { n1:'#5a3d8a', n2:'#7a5ab0', n3:'#159060', n4:'#c97c08' },
+  autoinco: { n1:'#1a6640', n2:'#2a9060', n3:'#5a3d8a' }
+};
+const COMP_COLS = ['#3d4f5e','#5a7a8a','#2d7a5a','#7a5c2e'];
+
+const AI_TOTAL_RED   = 22759;
+const AI_TOTAL_INV   = 20272;
+const AI_TOTAL_AA    = 407;
+const AI_TOTAL_KC    = 192;
+const AI_TOTAL_UC    = 159;
+const AI_TOTAL_TIENDA = 913;
+const AI_TOTAL_REINCO = 816;
+const AI_NET         = 758; // sin invitación: aa + kc + uc
+
+function buildFunnelAI(d, elF, elP, isNyon, r) {
+  const C   = COLS.autoinco;
+  const c1  = isNyon ? C.n1 : COMP_COLS[0];
+  const c2  = isNyon ? C.n2 : COMP_COLS[1];
+  const c3  = isNyon ? C.n3 : COMP_COLS[2];
+  const pfx = isNyon ? 'n' : 'c';
+
+  elF.innerHTML = `
+    <div class="stage" id="${pfx}-s1">
+      <div class="bar" style="background:${c1};width:100%">
+        <span class="bar-num">${fmt(AI_TOTAL_RED)}</span>
+        <span class="bar-title">Incorporaciones · red completa</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c1">
+      <div class="conn-line" style="height:80px"></div>
+      <div class="conn-pct">${pct(AI_NET, AI_TOTAL_RED)} sin invitación</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s2">
+      <div class="bar" style="background:${c2};width:40%">
+        <span class="bar-num">${fmt(AI_NET)}</span>
+        <span class="bar-title">Sin invitación · red completa</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c2">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.total, AI_NET)} se incorporó con ${r}</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s3">
+      <div class="bar" style="background:${c3};width:36%">
+        <span class="bar-num">${fmt(d.total)}</span>
+        <span class="bar-title">Incorporada con consultora ${r}</span>
+      </div>
+    </div>`;
+
+  elP.innerHTML = `
+    <div class="info-card" style="border-left-color:${c1}" id="${pfx}-i1">
+      <div class="info-title">Todas las incorporaciones · red completa</div>
+      <div class="pills">
+        <span class="pill azul">💌 Invitación: ${fmt(AI_TOTAL_INV)}</span>
+        <span class="pill verde">⚙️ Asig. automática: ${fmt(AI_TOTAL_AA)}</span>
+        <span class="pill amber">🏪 Tienda: ${fmt(AI_TOTAL_TIENDA)}</span>
+        <span class="pill purp">👤 C. conocida: ${fmt(AI_TOTAL_KC)}</span>
+        <span class="pill rosa">🔁 Reincorporación: ${fmt(AI_TOTAL_REINCO)}</span>
+        <span class="pill azul">📍 Geolocalización: ${fmt(AI_TOTAL_UC)}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:${c2}" id="${pfx}-i2">
+      <div class="info-title">Sin invitación · red completa</div>
+      <div class="pills">
+        <span class="pill verde">⚙️ Asig. automática: ${fmt(AI_TOTAL_AA)}</span>
+        <span class="pill purp">👤 C. conocida: ${fmt(AI_TOTAL_KC)}</span>
+        <span class="pill azul">📍 Geolocalización: ${fmt(AI_TOTAL_UC)}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:${c3}" id="${pfx}-i3">
+      <div class="info-title">Incorporadas con ${r}</div>
+      <div class="pills">
+        <span class="pill verde">⚙️ Asig. automática: ${d.aa}</span>
+        <span class="pill purp">👤 C. conocida: ${d.kc}</span>
+        <span class="pill azul">📍 Geolocalización: ${d.uc}</span>
+      </div>
+    </div>`;
+}
+
+function buildFunnelC(d, elF, elP, isNyon, r) {
+  const C = COLS.comprar;
+  const pfx = isNyon ? 'n' : 'c';
+  const cols = isNyon ? [C.n1, C.n2, C.n3, C.n4] : COMP_COLS;
+  const C_TOTAL = TOTALES.comprar; // 1929 red completa
+
+  elF.innerHTML = `
+    <div class="stage" id="${pfx}-s1">
+      <div class="bar" style="background:${cols[0]};width:100%">
+        <span class="bar-num">${fmt(C_TOTAL)}</span>
+        <span class="bar-title">Formularios enviados · red completa</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c1">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.total, C_TOTAL)} corresponde a ${r}</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s2">
+      <div class="bar" style="background:${cols[1]};width:80%">
+        <span class="bar-num">${fmt(d.total)}</span>
+        <span class="bar-title">Formularios de ${r}</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c2">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.geo, d.total)} buscó por geolocalización</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s3">
+      <div class="bar" style="background:${cols[2]};width:60%">
+        <span class="bar-num">${fmt(d.geo)}</span>
+        <span class="bar-title">Búsqueda por geolocalización</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c3">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.geo_valido, d.geo)} con datos válidos</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s4">
+      <div class="bar" style="background:${cols[3]};width:40%">
+        <span class="bar-num">${fmt(d.geo_valido)}</span>
+        <span class="bar-title">Contactos geo válidos</span>
+      </div>
+    </div>`;
+
+  elP.innerHTML = `
+    <div class="info-card" style="border-left-color:${cols[0]}" id="${pfx}-i1">
+      <div class="info-title">Red completa · formularios comprar</div>
+      <div class="info-sub">Total: <strong>${fmt(C_TOTAL)}</strong> · 40 meses</div>
+    </div>
+    <div class="info-card" style="border-left-color:${cols[1]}" id="${pfx}-i2">
+      <div class="info-title">Tipo de búsqueda · ${r}</div>
+      <div class="pills">
+        <span class="pill azul">📍 Geolocalización: ${d.geo}</span>
+        <span class="pill rosa">👤 Por nombre: ${d.nombre}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:${cols[2]}" id="${pfx}-i3">
+      <div class="info-title">Origen selección · solo geo</div>
+      <div class="pills">
+        <span class="pill azul">👆 Eligió consultora: ${d.geo_por_lead}</span>
+        <span class="pill amber">⚙️ Asignada por Just: ${d.geo_por_just}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:${cols[3]}" id="${pfx}-i4">
+      <div class="info-title">Calidad de datos · solo geo</div>
+      <div class="pills">
+        <span class="pill verde">✅ Datos válidos: ${d.geo_valido}</span>
+        <span class="pill rojo">❌ Datos inválidos: ${d.geo_invalido}</span>
+      </div>
+      <div class="info-note">${pct(d.geo_invalido, d.geo)} de las geo con datos inválidos</div>
+    </div>`;
+}
+
+function buildFunnelV(d, elF, elP, isNyon, r) {
+  const C = COLS.vender;
+  const cols = isNyon ? [C.n1,C.n2,C.n3,C.n4] : COMP_COLS;
+  const pfx = isNyon ? 'n' : 'c';
+  const V_TOTAL = TOTALES.vender; // 8529 red completa
+
+  elF.innerHTML = `
+    <div class="stage" id="${pfx}-s1">
+      <div class="bar" style="background:${cols[0]};width:100%">
+        <span class="bar-num">${fmt(V_TOTAL)}</span>
+        <span class="bar-title">Formularios enviados · red completa</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c1">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.total,V_TOTAL)} corresponde a ${r}</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s2">
+      <div class="bar" style="background:${cols[1]};width:76%">
+        <span class="bar-num">${fmt(d.total)}</span>
+        <span class="bar-title">Formularios de ${r}</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c2">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.seleccion,d.total)} vio selección de consultoras</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s3">
+      <div class="bar" style="background:${cols[2]};width:55%">
+        <span class="bar-num">${fmt(d.seleccion)}</span>
+        <span class="bar-title">Llegó a selección</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c3">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.incorporada,d.seleccion)} se incorporó</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s4">
+      <div class="bar" style="background:${cols[2]};width:38%">
+        <span class="bar-num">${fmt(d.incorporada)}</span>
+        <span class="bar-title">Incorporada / Reincorporada</span>
+      </div>
+    </div>
+    <div class="connector" id="${pfx}-c4">
+      <div class="conn-line"></div>
+      <div class="conn-pct">${pct(d.con_kit,d.incorporada)} activó kit</div>
+      <div class="conn-arrow"></div>
+    </div>
+    <div class="stage" id="${pfx}-s5">
+      <div class="bar" style="background:${cols[3]};width:22%">
+        <span class="bar-num">${fmt(d.con_kit)}</span>
+        <span class="bar-title">Con kit activado</span>
+      </div>
+    </div>`;
+
+  elP.innerHTML = `
+    <div class="info-card" style="border-left-color:${cols[0]}" id="${pfx}-i1">
+      <div class="info-title">Red completa · formularios vender</div>
+      <div class="info-sub">Total: <strong>${fmt(V_TOTAL)}</strong> · 24 meses (2023–2024)</div>
+    </div>
+    <div class="info-card" style="border-left-color:${cols[1]}" id="${pfx}-i2">
+      <div class="info-title">Tipo de búsqueda · ${r}</div>
+      <div class="pills">
+        <span class="pill purp">📍 Geolocalización: ${d.geo}</span>
+        <span class="pill azul">👤 Por nombre: ${d.nombre}</span>
+      </div>
+    </div>
+    <div class="info-card" style="border-left-color:${cols[2]}" id="${pfx}-i3">
+      <div class="info-title">Incorporación</div>
+      <div class="pills">
+        <span class="pill verde">🔁 Incorporada + reincorporada: ${d.incorporada}</span>
+        <span class="pill verde">🎒 Con kit: ${d.con_kit}</span>
+      </div>
+      <div class="info-note">${pct(d.incorporada,d.total)} conv. total a incorporación</div>
+    </div>
+    <div class="info-card" style="border-left-color:${cols[3]}" id="${pfx}-i4">
+      <div class="info-title">Tasa conversión</div>
+      <div class="info-sub">
+        <strong>${pct(d.con_kit,d.total)}</strong> del total llegó a activar kit
+      </div>
+    </div>`;
+}
+
+function populateSelect() {
+  const sel = document.getElementById('regionSelect');
+  sel.innerHTML = '';
+  const DATA = MODE === 'comprar' ? DATA_C : (MODE === 'vender' ? DATA_V : DATA_AI);
+  const nyon_key = 'NYON';
+  Object.keys(DATA).sort().filter(k => k !== nyon_key).forEach(r => {
+    const o = document.createElement('option');
+    o.value = r; o.textContent = r;
+    if (r === 'CHUR') o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function renderAll() {
+  const DATA = MODE === 'comprar' ? DATA_C : (MODE === 'vender' ? DATA_V : DATA_AI);
+  const nyon = DATA['NYON'];
+  const r    = document.getElementById('regionSelect').value;
+  const d    = DATA[r];
+  if (!nyon || !d) return;
+
+  // label NYON
+  const nl = document.getElementById('nyon-label');
+  // label class set in setMode
+  nl.textContent = 'NYON';
+
+  const elNF = document.getElementById('nyon-funnel');
+  const elNP = document.getElementById('nyon-panel');
+  const elCF = document.getElementById('comp-funnel');
+  const elCP = document.getElementById('comp-panel');
+
+  if (MODE === 'comprar') {
+    buildFunnelC(nyon, elNF, elNP, true,  'NYON');
+    buildFunnelC(d,    elCF, elCP, false, r);
+  } else if (MODE === 'vender') {
+    buildFunnelV(nyon, elNF, elNP, true,  'NYON');
+    buildFunnelV(d,    elCF, elCP, false, r);
+  } else {
+    buildFunnelAI(nyon, elNF, elNP, true,  'NYON');
+    buildFunnelAI(d,    elCF, elCP, false, r);
+  }
+
+  // aviso vender
+  // notes handled in setMode
+
+  // promedios
+  const total  = TOTALES[MODE];
+  const meses  = MESES[MODE];
+  const isC    = MODE !== 'vender';  // comprar y autoinco usan formato de 3 etapas
+
+  document.getElementById('avg-title').textContent =
+    MODE === 'comprar'  ? 'Promedio mensual por etapa · 40 meses (2023 – mayo 2026)' :
+    MODE === 'vender'   ? 'Promedio mensual por etapa · 24 meses (2023 – 2024)' :
+                          'Promedio mensual por etapa · 28 meses (mar 2024 – may 2026)';
+
+  const totalBar = document.getElementById('avg-total-bar');
+  const totalVal = document.getElementById('avg-total-val');
+  const totalLbl = document.getElementById('avg-total-label');
+  const modeColor = MODE === 'comprar' ? '#1a5fa8' : (MODE === 'vender' ? '#5a3d8a' : '#1a6640');
+  totalBar.style.background = modeColor;
+  totalVal.style.color      = modeColor;
+  totalLbl.style.color      = modeColor;
+  totalVal.textContent      = fmtDec(total / meses);
+
+  // rows NYON
+  const isAI = MODE === 'autoinco';
+  const avgNyon = buildAvgRows(nyon, meses, isC, true, isAI);
+  document.getElementById('avg-nyon-rows').innerHTML = avgNyon;
+
+  // rows comp
+  document.getElementById('avg-comp-label').textContent = r;
+  document.getElementById('avg-comp-rows').innerHTML = buildAvgRows(d, meses, isC, false, isAI);
+
+  setTimeout(alignAll, 50);
+}
+
+function buildAvgRows(d, meses, isC, isNyon, isAI) {
+  const c = isAI
+    ? (isNyon ? ['#1a6640','#2a9060','#5a3d8a'] : [COMP_COLS[0],COMP_COLS[1],COMP_COLS[2]])
+    : isNyon
+      ? (isC ? ['#1a5fa8','#2e82cc','#159060','#c97c08'] : ['#5a3d8a','#7a5ab0','#159060','#c97c08'])
+      : (isC ? [COMP_COLS[0],COMP_COLS[1],COMP_COLS[2],COMP_COLS[3]] : COMP_COLS);
+  const total = TOTALES[MODE];
+
+  if (isAI) {
+    return `
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[0]};font-weight:700;">Incorporaciones red completa</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:100%;background:${c[0]}"></div></div>
+        <div class="avg-value" style="color:${c[0]};">${fmtDec(AI_TOTAL_RED/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[1]};font-weight:700;">Sin invitación · red completa</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(AI_NET,AI_TOTAL_RED)}%;background:${c[1]}"></div></div>
+        <div class="avg-value" style="color:${c[1]};">${fmtDec(AI_NET/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[2]};font-weight:700;">Incorporada con ${isNyon ? 'NYON' : 'región'}</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.total,AI_TOTAL_RED)}%;background:${c[2]};min-width:3px"></div></div>
+        <div class="avg-value" style="color:${c[2]};">${fmtDec(d.total/meses)}</div>
+      </div>`;
+  } else if (isC) {
+    const C_TOTAL = TOTALES.comprar;
+    return `
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[0]};font-weight:700;">Formularios red completa</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:100%;background:${c[0]}"></div></div>
+        <div class="avg-value" style="color:${c[0]};">${fmtDec(C_TOTAL/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[1]};font-weight:700;">Formularios ${isNyon ? 'NYON' : 'región'}</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.total,C_TOTAL)}%;background:${c[1]}"></div></div>
+        <div class="avg-value" style="color:${c[1]};">${fmtDec(d.total/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[2]};font-weight:700;">Búsqueda por geolocalización</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.geo,C_TOTAL)}%;background:${c[2]}"></div></div>
+        <div class="avg-value" style="color:${c[2]};">${fmtDec(d.geo/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[3]};font-weight:700;">Contactos geo válidos</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.geo_valido,C_TOTAL)}%;background:${c[3]};min-width:3px"></div></div>
+        <div class="avg-value" style="color:${c[3]};">${fmtDec(d.geo_valido/meses)}</div>
+      </div>`;
+  } else {
+    const V_TOTAL = TOTALES.vender;
+    return `
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[0]};font-weight:700;">Formularios red completa</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:100%;background:${c[0]}"></div></div>
+        <div class="avg-value" style="color:${c[0]};">${fmtDec(V_TOTAL/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[1]};font-weight:700;">Formularios ${isNyon ? 'NYON' : 'región'}</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.total,V_TOTAL)}%;background:${c[1]}"></div></div>
+        <div class="avg-value" style="color:${c[1]};">${fmtDec(d.total/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[2]};font-weight:700;">Llegó a selección</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.seleccion,V_TOTAL)}%;background:${c[2]}"></div></div>
+        <div class="avg-value" style="color:${c[2]};">${fmtDec(d.seleccion/meses)}</div>
+      </div>
+      <div class="avg-row">
+        <div class="avg-label" style="color:${c[3]};font-weight:700;">Incorporada / Reincorporada</div>
+        <div class="avg-bar-wrap"><div class="avg-bar" style="width:${bw(d.incorporada,V_TOTAL)}%;background:${c[3]};min-width:3px"></div></div>
+        <div class="avg-value" style="color:${c[3]};">${fmtDec(d.incorporada/meses)}</div>
+      </div>`;
+  }
+}
+
+function setMode(m) {
+  MODE = m;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.toggle-btn.' + m).classList.add('active');
+  updateBanner(m);
+
+  const isBuscador = m === 'buscador';
+  document.getElementById('vender-note').style.display    = m === 'vender'   ? 'block' : 'none';
+  document.getElementById('autoinco-note').style.display  = m === 'autoinco' ? 'block' : 'none';
+
+  // update nyon label class
+  const nl = document.getElementById('nyon-label');
+  nl.className = 'funnel-label ' + (m === 'comprar' ? 'nyon-c' : m === 'vender' ? 'nyon-v' : m === 'autoinco' ? 'nyon-a' : 'nyon-b');
+
+  const subtitles = {
+    buscador: 'Buscador de consultores/as',
+    comprar:  'Prospects que completaron el formulario de contacto desde el buscador',
+    vender:   'Prospects que completaron el formulario de contacto desde el buscador',
+    autoinco: 'Incorporaciones sin invitación',
+  };
+  document.getElementById('main-subtitle').textContent = subtitles[m] || '';
+
+  const dateRanges = {
+    buscador: '📅 jun 2024 – may 2026 · 23 meses · 15.088 búsquedas registradas',
+    comprar:  '📅 2023 – mayo 2026 · 10.458 contactos totales',
+    vender:   '📅 2023 – 2024 · 8.529 contactos totales',
+    autoinco: '📅 mar 2024 – may 2026 · 22.759 incorporaciones · 758 sin invitación',
+  };
+  document.getElementById('date-range').textContent = dateRanges[m] || '';
+  const drColors = { buscador:'#155f45', comprar:'#2059a8', vender:'#5a3d8a', autoinco:'#1a6640' };
+  document.getElementById('date-range').style.background = drColors[m] || '#2059a8';
+
+  if (isBuscador) {
+    renderBuscador();
+  } else {
+    // repopulate select for contactos modes
+    const sel = document.getElementById('regionSelect');
+    sel.innerHTML = '';
+    sel.dataset.buscadorPopulated = '';
+    populateSelect();
+    // ensure selected region exists in current DATA
+    const DATA = m === 'comprar' ? DATA_C : (m === 'vender' ? DATA_V : DATA_AI);
+    if (!DATA[sel.value]) {
+      const first = Object.keys(DATA).sort().find(k => k !== 'NYON');
+      if (first) sel.value = first;
+    }
+    renderAll();
+  }
+  updateFooter(m);
+}
+
+function updateComp() {
+  if (MODE === 'buscador') updateBuscadorComp();
+  else renderAll();
+}
+
+function alignPanel(canvasId, pfx) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const nStages = MODE === 'buscador' ? 4 : (MODE === 'autoinco' ? 3 : (MODE === 'vender' ? 5 : 4));
+
+  // Reset tops so measurements are clean
+  for (let i = 1; i <= nStages; i++) {
+    const cEl = document.getElementById(pfx+'-i'+i);
+    if (cEl) cEl.style.top = '0px';
+  }
+
+  const ct = canvas.getBoundingClientRect().top;
+
+  // First pass: align each card to its stage midpoint
+  const tops = [];
+  for (let i = 1; i <= nStages; i++) {
+    const sEl = document.getElementById(pfx+'-s'+i);
+    const cEl = document.getElementById(pfx+'-i'+i);
+    if (!sEl || !cEl) { tops.push(null); continue; }
+    const sr = sEl.getBoundingClientRect();
+    const ch = cEl.offsetHeight || 60;
+    const ideal = sr.top + sr.height / 2 - ct - ch / 2;
+    tops.push({ el: cEl, top: ideal, h: ch });
+  }
+
+  // Second pass: push down overlapping cards (8px gap), never above 0
+  const GAP = 8;
+  let cursor = 4;  // first card never above 4px from top of canvas
+  for (let i = 0; i < tops.length; i++) {
+    const t = tops[i];
+    if (!t) continue;
+    if (t.top < cursor) t.top = cursor;
+    if (t.top < 0) t.top = 0;
+    t.el.style.top = t.top + 'px';
+    cursor = t.top + t.h + GAP;
+  }
+
+  // Set canvas min-height to fit both funnel and all cards
+  const lastStage = document.getElementById(pfx+'-s'+nStages);
+  const lastCard  = tops.filter(Boolean).pop();
+  const stageBottom = lastStage ? lastStage.getBoundingClientRect().bottom - ct : 0;
+  const cardBottom  = lastCard  ? lastCard.top + lastCard.h : 0;
+  canvas.style.minHeight = Math.max(stageBottom, cardBottom) + 20 + 'px';
+}
+
+function alignAll() {
+  // Double rAF ensures browser has painted before we measure
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    alignPanel('canvas-nyon', 'n');
+    alignPanel('canvas-comp', 'c');
+  }));
+}
+
+const FOOTERS = {
+  buscador: `
+    Fuente: <a href="https://docs.google.com/spreadsheets/d/1wrXrdPxMznC91U69XCLsAIhUa3hnPHv5zsQEBAlkvnQ/edit" target="_blank" style="color:#155f45;font-weight:700;">Buscador de Consultoras - NYON</a> · SwissJust Argentina<br>
+    Período: jun 2024 – may 2026 · 23 meses · 15.088 búsquedas registradas
+  `,
+  comprar: `
+    Fuente: <a href="https://docs.google.com/spreadsheets/d/170c9Em_1EWf7BJ_VKV9R8z_i1kq-_5nc6CsSw0nKMy4/edit" target="_blank" style="color:#1a5fa8;font-weight:700;">contactos_con_region</a> · SwissJust Argentina<br>
+    Tipo de contacto: <em>comprar</em> · Período: 2023 – mayo 2026 · 40 meses · 1.929 contactos NYON
+  `,
+  vender: `
+    Fuente: <a href="https://docs.google.com/spreadsheets/d/170c9Em_1EWf7BJ_VKV9R8z_i1kq-_5nc6CsSw0nKMy4/edit" target="_blank" style="color:#5a3d8a;font-weight:700;">contactos_con_region</a> · SwissJust Argentina<br>
+    Tipo de contacto: <em>vender</em> · Período: 2023 – 2024 · 24 meses · 8.529 contactos totales
+  `,
+  autoinco: `
+    Fuente: <a href="https://docs.google.com/spreadsheets/d/1Uu9-bsifOw9amHQpXlJB2UK3KsqqkVqVjAFy4heXhMA/edit" target="_blank" style="color:#1a6640;font-weight:700;">_Query_para_sacar_la_info_para_NYON_pero_trayendo_todos_los_sour</a> · SwissJust Argentina<br>
+    Sources incluidos: Asignación automática · Consultora conocida · Geolocalización<br>
+    Período: mar 2024 – may 2026 · 28 meses · 747 registraciones sin invitación
+  `,
+};
+
+function updateFooter(m) {
+  document.getElementById('footer-contactos').innerHTML = FOOTERS[m] || '';
+}
+
+const BANNERS = {
+  buscador: { color: '#155f45', text: 'Muestra el flujo de búsqueda de consultoras en el sitio web de Just. Un potencial cliente ingresa su ubicación o el nombre de una consultora, navega los resultados y puede iniciar un contacto directo o acceder directamente a su Tienda Personal.' },
+  comprar:  { color: '#1a5fa8', text: 'Muestra el flujo de leads que completaron el formulario queriendo comprar productos. El lead indica si conoce a una consultora (búsqueda por nombre) o no (búsqueda por geolocalización), en cuyo caso puede elegir una consultora de los resultados o dejar que Just le asigne la más cercana.' },
+  vender:   { color: '#5a3d8a', text: 'Muestra el flujo de personas interesadas en convertirse en consultoras. El lead indica si conoce a una consultora (búsqueda por nombre) o no (búsqueda por geolocalización), en cuyo caso puede elegir una de los resultados o dejar que Just le asigne una. Desde ese punto se registra si llega a la selección, si se incorpora y si activa su kit de inicio.' },
+  autoinco: { color: '#1a6640', text: 'Muestra el proceso de incorporación de nuevas consultoras a través del flujo de la nueva web de auto incorporación. Se enfoca en los casos donde la nueva consultora llega sin invitación previa — por asignación automática, consultora conocida o geolocalización — y se incorpora a una consultora de la red.' },
+};
+
+function updateBanner(m) {
+  const b = BANNERS[m];
+  const el = document.getElementById('mode-banner');
+  el.innerHTML = b.text;
+  el.style.borderLeftColor = b.color;
+}
+
+window.addEventListener('load', () => { setMode('buscador'); });
+window.addEventListener('resize', alignAll);
+</script>
+</body>
+</html>

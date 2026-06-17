@@ -333,9 +333,10 @@ function renderBuscador() {
   // Populate select with buscador regions if not already done
   if (!sel.dataset.buscadorPopulated) {
     sel.innerHTML = '';
+    let bIdx = 1;
     Object.keys(DATA_B).sort().filter(k => k !== 'NYON').forEach(reg => {
       const o = document.createElement('option');
-      o.value = reg; o.textContent = reg;
+      o.value = reg; o.textContent = 'Región ' + bIdx++;
       if (reg === 'CHUR') o.selected = true;
       sel.appendChild(o);
     });
@@ -515,7 +516,7 @@ function updateBuscadorComp() {
       <div class="avg-value" style="color:#159060;">0,04</div>
     </div>`;
 
-  document.getElementById('avg-comp-label').textContent = r;
+  document.getElementById('avg-comp-label').textContent = 'Región seleccionada';
   const wRes = Math.max(0.5, (d.enResultados / BUSCADOR_TOTAL * 100)).toFixed(1);
   const wSel = Math.max(0.5, (d.seleccionada  / BUSCADOR_TOTAL * 100)).toFixed(1);
   const wCmp = Math.max(0.1, (d.compras       / BUSCADOR_TOTAL * 100)).toFixed(2);
@@ -795,9 +796,10 @@ function populateSelect() {
   sel.innerHTML = '';
   const DATA = MODE === 'comprar' ? DATA_C : (MODE === 'vender' ? DATA_V : DATA_AI);
   const nyon_key = 'NYON';
+  let idx = 1;
   Object.keys(DATA).sort().filter(k => k !== nyon_key).forEach(r => {
     const o = document.createElement('option');
-    o.value = r; o.textContent = r;
+    o.value = r; o.textContent = 'Región ' + idx++;
     if (r === 'CHUR') o.selected = true;
     sel.appendChild(o);
   });
@@ -822,13 +824,13 @@ function renderAll() {
 
   if (MODE === 'comprar') {
     buildFunnelC(nyon, elNF, elNP, true,  'NYON');
-    buildFunnelC(d,    elCF, elCP, false, r);
+    buildFunnelC(d,    elCF, elCP, false, 'Región seleccionada');
   } else if (MODE === 'vender') {
     buildFunnelV(nyon, elNF, elNP, true,  'NYON');
-    buildFunnelV(d,    elCF, elCP, false, r);
+    buildFunnelV(d,    elCF, elCP, false, 'Región seleccionada');
   } else {
     buildFunnelAI(nyon, elNF, elNP, true,  'NYON');
-    buildFunnelAI(d,    elCF, elCP, false, r);
+    buildFunnelAI(d,    elCF, elCP, false, 'Región seleccionada');
   }
 
   // aviso vender
@@ -859,7 +861,7 @@ function renderAll() {
   document.getElementById('avg-nyon-rows').innerHTML = avgNyon;
 
   // rows comp
-  document.getElementById('avg-comp-label').textContent = r;
+  document.getElementById('avg-comp-label').textContent = 'Región seleccionada';
   document.getElementById('avg-comp-rows').innerHTML = buildAvgRows(d, meses, isC, false, isAI);
 
   setTimeout(alignAll, 50);
